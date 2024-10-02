@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PLayerController : MonoBehaviour
+public class PlayerControls : MonoBehaviour
 {
     [Header("Horizontal Movement Settings")]
     [SerializeField] private float walkSpeed = 1;
