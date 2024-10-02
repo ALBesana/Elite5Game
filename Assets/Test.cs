@@ -15,7 +15,7 @@ public class PLayerController : MonoBehaviour
     [SerializeField] private LayerMask IsGround;
 
     private Rigidbody2D rb;
-    private float xAxiss;
+    private float xAxisss;
 
 
     // Start is called before the first frame update
