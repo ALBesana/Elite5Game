@@ -17,7 +17,6 @@ public class PLayerController : MonoBehaviour
     private Rigidbody2D rb;
     private float xAxis;
 
-
     // Start is called before the first frame update
     void Start()
     {
