@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class PLayerController : MonoBehaviour
 {
+    [SerializeField] private Vector4 crouchingSize;
+    [SerializeField] private Vector4 standingSize;
     [Header("Horizontal Movement Settings")]
-    [SerializeField] private float walkSpeed = 1;
+    [SerializeField] private float walkSpeed= 1;
+    [SerializeField] private float sprintSpeed = 2;
+    [SerializeField] private float crouchSpeed = 2.5f;
 
     [Header("Ground Check Settings")]
     [SerializeField] private float jumpForce = 45f;
@@ -16,6 +20,8 @@ public class PLayerController : MonoBehaviour
 
     private Rigidbody2D rb;
     private float xAxis;
+    private bool isSprint;
+    private BoxCollider2D bc;
 
     public static PLayerController Instance;
 
@@ -37,6 +43,7 @@ public class PLayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        bc = GetComponent<BoxCollider2D>();
     }
 
     // Update is called once per frame
@@ -55,6 +62,29 @@ public class PLayerController : MonoBehaviour
     private void Move()
     {
         rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            isSprint = true;
+        }
+        else
+        {
+            isSprint = false;
+        }
+
+        if (isSprint == true)
+        {
+            rb.velocity = new Vector2(sprintSpeed * xAxis, rb.velocity.y);
+        }
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            rb.velocity = new Vector2(crouchSpeed * xAxis, rb.velocity.y);
+            bc.size = crouchingSize;
+        }
+        else
+        {
+            bc.size = standingSize;
+        }
+        
     }
 
     public bool Grounded()
@@ -82,4 +112,5 @@ public class PLayerController : MonoBehaviour
             rb.velocity = new Vector3(rb.velocity.x, jumpForce);
         }
     }
+
 }
