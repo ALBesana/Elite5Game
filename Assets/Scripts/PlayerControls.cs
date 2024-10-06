@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerControls : MonoBehaviour
+public class PLayerController : MonoBehaviour
 {
     [Header("Horizontal Movement Settings")]
     [SerializeField] private float walkSpeed = 1;
@@ -16,6 +16,22 @@ public class PlayerControls : MonoBehaviour
 
     private Rigidbody2D rb;
     private float xAxis;
+
+    public static PLayerController Instance;
+
+    private void Awake()
+    {
+        if(Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+        } 
+        else 
+        {
+            Instance = this;
+        }
+
+    }
+
 
     // Start is called before the first frame update
     void Start()
@@ -43,7 +59,7 @@ public class PlayerControls : MonoBehaviour
 
     public bool Grounded()
     {
-        if (Physics2D.Raycast(groundCheckpoint.position, Vector2.down, groundCheckY, IsGround)
+        if(Physics2D.Raycast(groundCheckpoint.position, Vector2.down, groundCheckY, IsGround) 
             || Physics2D.Raycast(groundCheckpoint.position + new Vector3(groundCheckX, 0, 0), Vector2.down, groundCheckY, IsGround)
             || Physics2D.Raycast(groundCheckpoint.position + new Vector3(-groundCheckX, 0, 0), Vector2.down, groundCheckY, IsGround))
         {
@@ -51,11 +67,16 @@ public class PlayerControls : MonoBehaviour
         }
         else
         {
-            return false;
+            return false; 
         }
     }
     void Jump()
     {
+        if (Input.GetButtonUp("Jump") && rb.velocity.y > 0)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+        }
+
         if (Input.GetButtonDown("Jump") && Grounded())
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce);
