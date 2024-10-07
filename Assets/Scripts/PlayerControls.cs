@@ -22,6 +22,9 @@ public class PLayerController : MonoBehaviour
     bool attack;
     float timeBetweenAtk, timeSinceAtk;
     [SerializeField] Transform sideAttackTrans;
+    [SerializeField] Vector2 sideAttackArea;
+    [SerializeField] LayerMask attackableLayer;
+    [SerializeField] float damage;
 
 
 
@@ -55,6 +58,11 @@ public class PLayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         bc = GetComponent<BoxCollider2D>();
     }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(sideAttackTrans.position, sideAttackArea);
+    }
 
     // Update is called once per frame
     void Update()
@@ -63,6 +71,7 @@ public class PLayerController : MonoBehaviour
         Move();
         Jump();
         Attack();
+        Flip();
     }
 
     void GetInputs()
@@ -70,12 +79,39 @@ public class PLayerController : MonoBehaviour
         xAxis = Input.GetAxisRaw("Horizontal");
         attack = Input.GetMouseButtonDown(0);
     }
+    void Flip()
+    {
+        if(xAxis < 0)
+        {
+            transform.localScale = new Vector2(-Mathf.Abs(transform.localScale.x), transform.localScale.y);
+        }
+        else if (xAxis > 0)
+        {
+            transform.localScale = new Vector2(Mathf.Abs(transform.localScale.x), transform.localScale.y);
+        }
+    }
     void Attack()
     {
         timeSinceAtk += Time.deltaTime;
         if (attack && timeSinceAtk >= timeBetweenAtk)
         {
             timeSinceAtk = 0;
+            Hit(sideAttackTrans, sideAttackArea);
+        }
+    }
+    private void Hit(Transform _attackTransform, Vector2 _attackArea)
+    {
+        Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer); 
+        if(objectsToHit.Length > 0)
+        {
+            Debug.Log("Hit");
+        }
+        for (int i =0; i < objectsToHit.Length; i++)
+        {
+            if(objectsToHit[i].GetComponent<Enemy>() != null)
+            {
+                objectsToHit[i].GetComponent<Enemy>().Enemyhit(damage);
+            }
         }
     }
 
