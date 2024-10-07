@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class PLayerController : MonoBehaviour
 {
-    [SerializeField] private Vector4 crouchingSize;
-    [SerializeField] private Vector4 standingSize;
+    [SerializeField] private Vector2 crouchingSize;
+    [SerializeField] private Vector2 standingSize;
     [Header("Horizontal Movement Settings")]
     [SerializeField] private float walkSpeed= 1;
     [SerializeField] private float sprintSpeed = 2;
@@ -18,10 +18,20 @@ public class PLayerController : MonoBehaviour
     [SerializeField] private float groundCheckX = 0.5f;
     [SerializeField] private LayerMask IsGround;
 
+    [Header("Attack Settings")]
+    bool attack;
+    float timeBetweenAtk, timeSinceAtk;
+    [SerializeField] Transform sideAttackTrans;
+
+
+
     private Rigidbody2D rb;
     private float xAxis;
     private bool isSprint;
+    private bool isCrouch;
     private BoxCollider2D bc;
+    private bool ADmove;
+
 
     public static PLayerController Instance;
 
@@ -52,11 +62,21 @@ public class PLayerController : MonoBehaviour
         GetInputs();
         Move();
         Jump();
+        Attack();
     }
 
     void GetInputs()
     {
         xAxis = Input.GetAxisRaw("Horizontal");
+        attack = Input.GetMouseButtonDown(0);
+    }
+    void Attack()
+    {
+        timeSinceAtk += Time.deltaTime;
+        if (attack && timeSinceAtk >= timeBetweenAtk)
+        {
+            timeSinceAtk = 0;
+        }
     }
 
     private void Move()
@@ -76,6 +96,15 @@ public class PLayerController : MonoBehaviour
             rb.velocity = new Vector2(sprintSpeed * xAxis, rb.velocity.y);
         }
         if (Input.GetKey(KeyCode.LeftControl))
+        {
+            isCrouch = true;
+        }
+        else
+        {
+            isCrouch = false;
+        
+        }
+        if (isCrouch ==  true)
         {
             rb.velocity = new Vector2(crouchSpeed * xAxis, rb.velocity.y);
             bc.size = crouchingSize;
