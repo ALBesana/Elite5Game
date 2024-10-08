@@ -26,8 +26,17 @@ public class PLayerController : MonoBehaviour
     [SerializeField] LayerMask attackableLayer;
     [SerializeField] float damage;
 
+    [Header("Recoil Setting")]
+    [SerializeField] float recoilXSteps = 5;
+    [SerializeField] float recoilYSteps = 5;
+    [SerializeField] float recoilXSpeed = 100;
+    int stepXRecoiled;
 
+    [Header("Health Setting")]
+    public int health;
+    public int maxHealth;
 
+    public PlayerStateList pState;
     private Rigidbody2D rb;
     private float xAxis;
     private bool isSprint;
@@ -48,13 +57,14 @@ public class PLayerController : MonoBehaviour
         {
             Instance = this;
         }
-
+        health = maxHealth;
     }
 
 
     // Start is called before the first frame update
     void Start()
     {
+        pState = GetComponent<PlayerStateList>();
         rb = GetComponent<Rigidbody2D>();
         bc = GetComponent<BoxCollider2D>();
     }
@@ -72,6 +82,7 @@ public class PLayerController : MonoBehaviour
         Jump();
         Attack();
         Flip();
+        Recoil();
     }
 
     void GetInputs()
@@ -84,10 +95,12 @@ public class PLayerController : MonoBehaviour
         if(xAxis < 0)
         {
             transform.localScale = new Vector2(-Mathf.Abs(transform.localScale.x), transform.localScale.y);
+            pState.lookingRight = false;
         }
         else if (xAxis > 0)
         {
             transform.localScale = new Vector2(Mathf.Abs(transform.localScale.x), transform.localScale.y);
+            pState.lookingRight = true;
         }
     }
     void Attack()
@@ -96,21 +109,21 @@ public class PLayerController : MonoBehaviour
         if (attack && timeSinceAtk >= timeBetweenAtk)
         {
             timeSinceAtk = 0;
-            Hit(sideAttackTrans, sideAttackArea);
+            Hit(sideAttackTrans, sideAttackArea, ref pState.recoilingX, recoilXSpeed);
         }
     }
-    private void Hit(Transform _attackTransform, Vector2 _attackArea)
+    private void Hit(Transform _attackTransform, Vector2 _attackArea, ref bool _recoilDir, float _recoilStrength)
     {
         Collider2D[] objectsToHit = Physics2D.OverlapBoxAll(_attackTransform.position, _attackArea, 0, attackableLayer); 
         if(objectsToHit.Length > 0)
         {
-            Debug.Log("Hit");
+            _recoilDir = true;
         }
         for (int i =0; i < objectsToHit.Length; i++)
         {
             if(objectsToHit[i].GetComponent<Enemy>() != null)
             {
-                objectsToHit[i].GetComponent<Enemy>().Enemyhit(damage);
+                objectsToHit[i].GetComponent<Enemy>().Enemyhit(damage, (transform.position - objectsToHit[i].transform.position).normalized, _recoilStrength);
             }
         }
     }
@@ -151,6 +164,54 @@ public class PLayerController : MonoBehaviour
         }
         
     }
+    void Recoil()
+    {
+        if(pState.recoilingX)
+        {
+            if(pState.lookingRight)
+            {
+                rb.velocity = new Vector2(-recoilXSpeed, 0);
+            }
+            else
+            {
+                rb.velocity = new Vector2(recoilXSpeed, 0);
+            }
+        }
+
+
+        if(pState.recoilingX && stepXRecoiled < recoilXSteps)
+        {
+            stepXRecoiled++;
+        }
+        else
+        {
+        StopRecoilX();
+        }
+    }
+        
+    void StopRecoilX()
+    {
+        stepXRecoiled = 0;
+        pState.recoilingX = false;
+    }
+
+    public void TakeDamage(float _damage)
+    {
+        health -= Mathf.RoundToInt(_damage);  
+        StartCoroutine(StopTakingDamage());
+    }
+    IEnumerator StopTakingDamage()
+    {
+        pState.invincible = true;
+        ClampHealth();
+        yield return new WaitForSeconds(1f);
+        pState.invincible = false;
+    }
+
+    void ClampHealth() 
+    {
+        health = Mathf.Clamp(health, 0, maxHealth);
+    }
 
     public bool Grounded()
     {
@@ -177,5 +238,4 @@ public class PLayerController : MonoBehaviour
             rb.velocity = new Vector3(rb.velocity.x, jumpForce);
         }
     }
-
 }
