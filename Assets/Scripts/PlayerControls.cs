@@ -111,6 +111,7 @@ public class PLayerController : MonoBehaviour
         if (attack && timeSinceAtk >= timeBetweenAtk)
         {
             timeSinceAtk = 0;
+            anim.SetTrigger("Attacking");
             Hit(sideAttackTrans, sideAttackArea, ref pState.recoilingX, recoilXSpeed);
         }
     }
