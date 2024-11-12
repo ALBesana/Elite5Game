@@ -207,6 +207,7 @@ public class PLayerController : MonoBehaviour
     IEnumerator StopTakingDamage()
     {
         pState.invincible = true;
+        anim.SetTrigger("TakeDamage");
         ClampHealth();
         yield return new WaitForSeconds(1f);
         pState.invincible = false;
