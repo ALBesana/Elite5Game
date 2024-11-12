@@ -379,7 +379,7 @@ Transform:
   m_GameObject: {fileID: 605250656}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.509, y: -0.015, z: 0}
+  m_LocalPosition: {x: 0.759, y: 0.104, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -712,13 +712,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   crouchingSize: {x: 1, y: 0.65}
-  standingSize: {x: 1, y: 1}
+  standingSize: {x: 0.5354346, y: 0.95}
   walkSpeed: 3
   sprintSpeed: 5
   crouchSpeed: 1
   jumpForce: 10
   groundCheckpoint: {fileID: 955050196}
-  groundCheckY: 0.2
+  groundCheckY: 0.11
   groundCheckX: 0.5
   IsGround:
     serializedVersion: 2
@@ -794,7 +794,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.052004278, y: 0}
+  m_Offset: {x: -0.052004278, y: -0.010326251}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -805,7 +805,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.5354346, y: 1}
+  m_Size: {x: 0.5354346, y: 0.9772482}
   m_EdgeRadius: 0
 --- !u!212 &697082382
 SpriteRenderer:

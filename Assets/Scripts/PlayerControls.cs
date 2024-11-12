@@ -240,5 +240,7 @@ public class PLayerController : MonoBehaviour
         {
             rb.velocity = new Vector3(rb.velocity.x, jumpForce);
         }
+
+        anim.SetBool("Jumping", !Grounded());
     }
 }
