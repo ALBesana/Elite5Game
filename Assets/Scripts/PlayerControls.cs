@@ -131,43 +131,44 @@ public class PLayerController : MonoBehaviour
         }
     }
 
-    private void Move()
-    {
-        rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
-        anim.SetBool("Walking", rb.velocity.x != 0 && Grounded());
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            isSprint = true;
-        }
-        else
-        {
-            isSprint = false;
-        }
+private void Move()
+{
+    // Determine the base speed based on the player's current state
+    float currentSpeed = walkSpeed; // Default speed
 
-        if (isSprint == true)
-        {
-            rb.velocity = new Vector2(sprintSpeed * xAxis, rb.velocity.y);
-        }
-        if (Input.GetKey(KeyCode.LeftControl))
+    // Check for sprinting if not crouching
+    if (Input.GetKey(KeyCode.LeftShift) && !isCrouch && Grounded())
+    {
+        isSprint = true;
+        currentSpeed = sprintSpeed;
+    }
+    else
+    {
+        isSprint = false;
+    }
+
+    // Check for crouching state
+    if (Input.GetKey(KeyCode.LeftControl) && Grounded())
+    {
+        if (!isCrouch) // Transition into crouching
         {
             isCrouch = true;
-        }
-        else
-        {
-            isCrouch = false;
-        
-        }
-        if (isCrouch ==  true)
-        {
-            rb.velocity = new Vector2(crouchSpeed * xAxis, rb.velocity.y);
             bc.size = crouchingSize;
         }
-        else
-        {
-            bc.size = standingSize;
-        }
-        
+        currentSpeed = crouchSpeed; // Set crouch speed
+        anim.SetBool("Crouching", true);
     }
+    else if (isCrouch) // Transition back to standing
+    {
+        isCrouch = false;
+        bc.size = standingSize;
+        anim.SetBool("Crouching", false);
+    }
+
+    // Apply movement with the chosen speed
+    rb.velocity = new Vector2(currentSpeed * xAxis, rb.velocity.y);
+    anim.SetBool("Walking", xAxis != 0 && Grounded() && !isCrouch); // Ensure crouch overrides walk animation
+}
     void Recoil()
     {
         if(pState.recoilingX)
