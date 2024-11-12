@@ -39,6 +39,7 @@ public class PLayerController : MonoBehaviour
     public PlayerStateList pState;
     private Rigidbody2D rb;
     private float xAxis;
+    Animator anim;
     private bool isSprint;
     private bool isCrouch;
     private BoxCollider2D bc;
@@ -66,6 +67,7 @@ public class PLayerController : MonoBehaviour
     {
         pState = GetComponent<PlayerStateList>();
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
         bc = GetComponent<BoxCollider2D>();
     }
     private void OnDrawGizmos()
@@ -131,6 +133,7 @@ public class PLayerController : MonoBehaviour
     private void Move()
     {
         rb.velocity = new Vector2(walkSpeed * xAxis, rb.velocity.y);
+        anim.SetBool("Walking", rb.velocity.x != 0 && Grounded());
         if (Input.GetKey(KeyCode.LeftShift))
         {
             isSprint = true;
