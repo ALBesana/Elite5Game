@@ -26,9 +26,6 @@ public class PLayerController : MonoBehaviour
     [SerializeField] LayerMask attackableLayer;
     [SerializeField] float damage;
 
-    bool restoreTime;
-    float restoreTimeSpeed;
-
     [Header("Recoil Setting")]
     [SerializeField] float recoilXSteps = 5;
     [SerializeField] float recoilYSteps = 5;
@@ -39,12 +36,8 @@ public class PLayerController : MonoBehaviour
     public int health;
     public int maxHealth;
 
-    [SerializeField] float hitFlashSpeed;
-
     public PlayerStateList pState;
     private Rigidbody2D rb;
-
-    private SpriteRenderer sr;
     private float xAxis;
     Animator anim;
     private bool isSprint;
@@ -76,7 +69,6 @@ public class PLayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         bc = GetComponent<BoxCollider2D>();
-        sr = GetComponent<SpriteRenderer>();
     }
     private void OnDrawGizmos()
     {
@@ -93,8 +85,6 @@ public class PLayerController : MonoBehaviour
         Attack();
         Flip();
         Recoil();
-        RestoreTimeScale();
-        FlashWhileInvincible();
     }
 
     void GetInputs()
@@ -178,6 +168,8 @@ public class PLayerController : MonoBehaviour
 
         rb.velocity = new Vector2(currentSpeed * xAxis, rb.velocity.y);
         anim.SetBool("Walking", xAxis != 0 && Grounded() && !isCrouch);
+        
+        anim.speed = isSprint ? sprintSpeed / walkSpeed : 1;
     }
 
     void Recoil()
@@ -222,48 +214,6 @@ public class PLayerController : MonoBehaviour
         anim.SetTrigger("TakeDamage");
         yield return new WaitForSeconds(1f);
         pState.invincible = false;
-    }
-
-    void FlashWhileInvincible()
-    {
-        sr.material.color = pState.invincible ?
-            Color.Lerp(Color.white, Color.black, Mathf.PingPong(Time.time * hitFlashSpeed, 1.0f)) : Color.white;
-    }
-
-    void RestoreTimeScale()
-    {
-        if(restoreTime)
-        {
-            if(Time.timeScale < 1)
-            {
-                Time.timeScale += Time.deltaTime * restoreTimeSpeed;
-            }
-            else
-            {
-                Time.timeScale = 1;
-                restoreTime = false;
-            }
-        }
-    }
-
-    public void HitStopTime(float _newTimeScale, int _restoreSpeed, float _delay)
-    {
-        restoreTimeSpeed = _restoreSpeed;
-        Time.timeScale = _newTimeScale;
-        if(_delay > 0)
-        {
-            StopCoroutine(StartTimeAgain(_delay));
-            StartCoroutine(StartTimeAgain(_delay));
-        }
-        else
-        {
-            restoreTime = true;
-        }
-    }
-    IEnumerator StartTimeAgain(float _delay)
-    {
-        restoreTime = true;
-        yield return new WaitForSeconds (_delay);
     }
 
     public int Health
