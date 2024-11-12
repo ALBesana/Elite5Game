@@ -131,44 +131,49 @@ public class PLayerController : MonoBehaviour
         }
     }
 
-private void Move()
-{
-    // Determine the base speed based on the player's current state
-    float currentSpeed = walkSpeed; // Default speed
+    private void Move()
+    {
+        // Determine the base speed based on the player's current state
+        float currentSpeed = walkSpeed; // Default speed
 
-    // Check for sprinting if not crouching
-    if (Input.GetKey(KeyCode.LeftShift) && !isCrouch && Grounded())
-    {
-        isSprint = true;
-        currentSpeed = sprintSpeed;
-    }
-    else
-    {
-        isSprint = false;
-    }
-
-    // Check for crouching state
-    if (Input.GetKey(KeyCode.LeftControl) && Grounded())
-    {
-        if (!isCrouch) // Transition into crouching
+        // Check for sprinting if not crouching
+        if (Input.GetKey(KeyCode.LeftShift) && !isCrouch && Grounded())
         {
-            isCrouch = true;
-            bc.size = crouchingSize;
+            isSprint = true;
+            currentSpeed = sprintSpeed;
         }
-        currentSpeed = crouchSpeed; // Set crouch speed
-        anim.SetBool("Crouching", true);
-    }
-    else if (isCrouch) // Transition back to standing
-    {
-        isCrouch = false;
-        bc.size = standingSize;
-        anim.SetBool("Crouching", false);
+        else
+        {
+            isSprint = false;
+        }
+
+        // Check for crouching state
+        if (Input.GetKey(KeyCode.LeftControl) && Grounded())
+        {
+            if (!isCrouch) // Transition into crouching
+            {
+                isCrouch = true;
+                bc.size = crouchingSize;
+            }
+            currentSpeed = crouchSpeed; // Set crouch speed
+            anim.SetBool("Crouching", true);
+
+            // Enable crouch-walking if moving while crouching
+            anim.SetBool("CrouchWalking", xAxis != 0);
+        }
+        else if (isCrouch) // Transition back to standing
+        {
+            isCrouch = false;
+            bc.size = standingSize;
+            anim.SetBool("Crouching", false);
+            anim.SetBool("CrouchWalking", false); // Ensure CrouchWalking is off
+        }
+
+        // Apply movement with the chosen speed
+        rb.velocity = new Vector2(currentSpeed * xAxis, rb.velocity.y);
+        anim.SetBool("Walking", xAxis != 0 && Grounded() && !isCrouch); // Ensure crouch overrides walk animation
     }
 
-    // Apply movement with the chosen speed
-    rb.velocity = new Vector2(currentSpeed * xAxis, rb.velocity.y);
-    anim.SetBool("Walking", xAxis != 0 && Grounded() && !isCrouch); // Ensure crouch overrides walk animation
-}
     void Recoil()
     {
         if(pState.recoilingX)
