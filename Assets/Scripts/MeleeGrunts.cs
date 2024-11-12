@@ -5,22 +5,37 @@ using UnityEngine;
 public class MeleeGrunts : Enemy
 {
     // Start is called before the first frame update
-    void Start()
-    {
-        rb.gravityScale = 12f;
-        
-    }
     protected override void Awake()
     {
         base.Awake();
     }
+
+    void Start()
+    {
+        rb.gravityScale = 12f;
+    }
+
     // Update is called once per frame
     protected override void Update()
     {
         base.Update();
-        if(!isRecoiling)
+
+        if (!isRecoiling)
         {
-            transform.position = Vector2.MoveTowards(transform.position, new Vector2(PLayerController.Instance.transform.position.x, transform.position.y), speed * Time.deltaTime);
+            Vector2 targetPosition = new Vector2(PLayerController.Instance.transform.position.x, transform.position.y);
+            transform.position = Vector2.MoveTowards(transform.position, targetPosition, speed * Time.deltaTime);
+
+            // Flip the direction based on movement
+            if (targetPosition.x < transform.position.x)
+            {
+                // Moving left, flip to face left
+                transform.localScale = new Vector3(-1 * Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+            }
+            else if (targetPosition.x > transform.position.x)
+            {
+                // Moving right, flip to face right
+                transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+            }
         }
     }
 
