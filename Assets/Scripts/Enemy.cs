@@ -17,6 +17,15 @@ public class Enemy : MonoBehaviour
     protected float recoilTimer;
     protected Rigidbody2D rb;
     // Start is called before the first frame update
+
+    protected enum EnemyStates
+    {
+        MeleeGrunts_Idle,
+        MeleeGrunts_Attack,
+        MeleeGrunts_Walk,
+    }
+    protected EnemyStates currentEnemyState;
+
     protected virtual void Start()
     {
         
@@ -30,6 +39,8 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     protected virtual void Update()
     {
+        UpdateEnemyStates();
+
         if(health <= 0)
         {
             Destroy(gameObject);
@@ -63,7 +74,14 @@ public class Enemy : MonoBehaviour
         {
             Attack();
         }
-    }   
+    }
+
+    protected virtual void UpdateEnemyStates() {}
+
+    protected void ChangeState(EnemyStates _newState)
+    {
+        currentEnemyState = _newState;
+    }
     protected virtual void Attack()
     {
         PLayerController.Instance.TakeDamage(damage);
