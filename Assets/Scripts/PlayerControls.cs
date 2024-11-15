@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement; 
+using TMPro; 
+using UnityEngine.UI; 
 
 public class PLayerController : MonoBehaviour
 {
+
     [SerializeField] private Vector2 crouchingSize;
     [SerializeField] private Vector2 standingSize;
     [Header("Horizontal Movement Settings")]
@@ -35,6 +39,11 @@ public class PLayerController : MonoBehaviour
     [Header("Health Setting")]
     public int health;
     public int maxHealth;
+    
+    [SerializeField] private TextMeshProUGUI interactionText;
+    [SerializeField] public GameObject targetObject;
+    private bool isNearTarget = false;
+    Transform targetPosition; 
 
     public PlayerStateList pState;
     private Rigidbody2D rb;
@@ -45,7 +54,10 @@ public class PLayerController : MonoBehaviour
     private BoxCollider2D bc;
     private bool ADmove;
 
+    [SerializeField] private GameObject pauseMenu; 
 
+    private bool isPaused = false;
+    
     public static PLayerController Instance;
 
     private void Awake()
@@ -59,6 +71,7 @@ public class PLayerController : MonoBehaviour
             Instance = this;
         }
         Health = maxHealth;
+        Time.timeScale = 1f;
     }
 
 
@@ -69,6 +82,10 @@ public class PLayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         bc = GetComponent<BoxCollider2D>();
+         if (interactionText != null)
+        {
+            interactionText.gameObject.SetActive(false);
+        }
     }
     private void OnDrawGizmos()
     {
@@ -79,12 +96,94 @@ public class PLayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (isPaused)
+            {
+                ResumeGame();
+            }
+            else
+            {
+                PauseGame();
+            }
+        }
+         if (isPaused)
+        {
+            return;
+        }
         GetInputs();
         Move();
         Jump();
         Attack();
         Flip();
         Recoil();
+
+        if (health <= 0)
+        {
+            SceneManager.LoadScene(2);
+        }
+        if (Input.GetKeyDown(KeyCode.E) && isNearTarget)
+        {
+            ChangeScene();
+        }
+    }
+     public void PauseGame()
+    {
+        isPaused = true;
+        Time.timeScale = 0f; 
+        pauseMenu.SetActive(true); 
+    }
+
+    public void ResumeGame()
+    {
+        isPaused = false;
+        Time.timeScale = 1f; 
+        pauseMenu.SetActive(false); 
+    }
+    public void RetryGame()
+    {
+        SceneManager.LoadScene(1);
+        isPaused = false;
+        Time.timeScale = 1f; 
+        pauseMenu.SetActive(false); 
+    }
+
+    public void QuitGame()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.gameObject == targetObject) // Ensure this is the Capybara
+        {
+            isNearTarget = true;
+             if (interactionText != null)
+            {
+                interactionText.gameObject.SetActive(true);
+            }
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.gameObject == targetObject)
+        {
+            isNearTarget = false;
+            if (interactionText != null)
+            {
+                interactionText.gameObject.SetActive(false);
+            }
+        }
+    }
+    void ChangeScene()  
+    {
+        SceneManager.LoadScene(3);
+    }
+
+    public void MoveToPosition(Vector3 targetPosition)
+    {
+        transform.position = targetPosition;
     }
 
     void GetInputs()

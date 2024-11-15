@@ -14,4 +14,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/PlayPlaceHolder.unity
     guid: 889eb81bf1cfcb04a85ce536fa8ff953
+  - enabled: 1
+    path: Assets/Scenes/GameOver.unity
+    guid: d884e180aad1b4f46b183fbf3738255c
+  - enabled: 1
+    path: Assets/Scenes/YouWin.unity
+    guid: 5ef6b7debf582f34f95d880e72ced523
   m_configObjects: {}
